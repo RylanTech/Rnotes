@@ -1,0 +1,38 @@
+.navigation {
+    background-color: #50AF60;
+}
+.searchBar {
+    padding: 10px;
+}
+.MenuBtn {
+    margin: 10px;
+}
+.txtarea {
+    border: none;
+    overflow: auto;
+    outline: none;
+
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    resize: none; /*remove the resize handle on the bottom right*/
+    height: 100%;
+}
+.pageTxtContent {
+    max-height: 120px!important;
+    overflow-y: hidden;
+}
+.contentCard {
+    margin-top: 15px!important;
+    padding: 2px!important;
+    font-size: 13px;
+}
+.contentCard:hover {
+    box-shadow: 5px 5px 5px #50AF60;
+    padding: 0px 0px 5px 0px!important;
+}
+
+.card-title {
+    margin-left: 5px;
+}
