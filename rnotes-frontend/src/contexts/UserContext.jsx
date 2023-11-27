@@ -11,6 +11,7 @@ export const UserProvider = (props) => {
 
         return axios.post(baseUrl + "api/user/signin", credentials)
         .then(response => {
+            
             localStorage.setItem('rnotesToken', response.data)
             return new Promise(resolve => resolve(response.data));
           }
@@ -19,11 +20,13 @@ export const UserProvider = (props) => {
 
     function verify() {
         let myHeaders = {
-          Authorization: `Bearer ${localStorage.getItem('rpassToken')}`
+          Authorization: `Bearer ${localStorage.getItem('rnotesToken')}`
         };
+        console.log(myHeaders)
         return axios.post(baseUrl + "api/user/verify", null, {
           headers: myHeaders
         }).then(response => {
+          console.log(response)
             return new Promise(resolve => resolve(response.data));
           })
       }

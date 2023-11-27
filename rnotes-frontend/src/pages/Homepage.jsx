@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Button, Card, Container, Form, Modal, Row } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import Home from "../components/Home";
+import { Link, useNavigate } from 'react-router-dom'
+import { UserContext } from "../contexts/UserContext"
 
 function Homepage() {
     const [screenWidth, setScreenWidth] = useState(undefined)
@@ -20,8 +20,21 @@ function Homepage() {
     const handleTwoShow = () => setShowTwo(true)
     const handleTwoClose = () => setShowTwo(false);
 
+    const { verify } = useContext(UserContext)
+    const navigate = useNavigate()
+
 
     useEffect(() => {
+        async function startup() {
+            let res = await verify()
+            console.log(res)
+            if (!res) {
+                navigate('/login')
+            }
+
+        }
+        startup()
+
         let screWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         setScreenWidth(screWidth)
     }, [])
@@ -60,17 +73,15 @@ function Homepage() {
         if (notes) {
             return notes.map((note) => {
                 return (
-                    <>
-                        <div className="col-6">
-                            <Card
-                                onClick={() => handleShow(note)}
-                                className="contentCard col-12"
-                            >
-                                <Card.Title>{note.title}</Card.Title>
-                                <Card.Body className="pageTxtContent">{note.content}</Card.Body>
-                            </Card>
-                        </div>
-                    </>
+                    <div className="col-6" key={note.noteId}>
+                        <Card
+                            onClick={() => handleShow(note)}
+                            className="contentCard col-12"
+                        >
+                            <Card.Title>{note.title}</Card.Title>
+                            <Card.Body className="pageTxtContent">{note.content}</Card.Body>
+                        </Card>
+                    </div>
                 )
             })
         }
@@ -87,8 +98,9 @@ function Homepage() {
                                     onChange={(e) => setCurrentTitle(e.target.value)}
                                     className="txtarea"
                                     spellCheck="false"
-                                    rows={1}>
-                                    {currentTitle}
+                                    rows={1}
+                                    value={currentTitle}>
+
                                 </textarea>
                             </div>
                         </Modal.Title>
@@ -98,8 +110,8 @@ function Homepage() {
                             onChange={(e) => setCurrentContent(e.target.value)}
                             className="col-12 txtarea"
                             rows={18}
-                            spellCheck={false}>
-                            {currentContent}
+                            spellCheck={false}
+                            value={currentContent}>
                         </textarea>
                     </Modal.Body>
                     <Modal.Footer>
@@ -109,7 +121,7 @@ function Homepage() {
                             </Button>
                         </Link>
                         <Button
-                        onClick={handleSubmit}
+                            onClick={handleSubmit}
                         >
                             Submit
                         </Button>
@@ -165,7 +177,6 @@ function Homepage() {
     } else {
         return (
             <>
-                <Home />
                 <Container>
                     <Row>
                         test2
