@@ -22,11 +22,9 @@ export const UserProvider = (props) => {
         let myHeaders = {
           Authorization: `Bearer ${localStorage.getItem('rnotesToken')}`
         };
-        console.log(myHeaders)
         return axios.post(baseUrl + "api/user/verify", null, {
           headers: myHeaders
         }).then(response => {
-          console.log(response)
             return new Promise(resolve => resolve(response.data));
           })
       }
