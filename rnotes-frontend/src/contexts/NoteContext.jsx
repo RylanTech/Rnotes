@@ -44,12 +44,38 @@ export const NoteProvider = (props) => {
         );
     }
 
+    function searchNote(query) {
+        let myHeaders = {
+            Authorization: `Bearer ${localStorage.getItem('rnotesToken')}`
+        };
+        return axios.get(baseUrl + "api/notes/search/" + query, {
+            headers: myHeaders
+        }).then(response => {
+            return new Promise(resolve => resolve(response.data));
+        }
+        );
+    }
+
+    function deleteNote(noteId) {
+        let myHeaders = {
+            Authorization: `Bearer ${localStorage.getItem('rnotesToken')}`
+        };
+        return axios.delete(baseUrl + "api/notes/delete/" + noteId, {
+            headers: myHeaders
+        }).then(response => {
+            return new Promise(resolve => resolve(response.data));
+        }
+        );
+    }
+
     return (
         <NoteContext.Provider
             value={{
                 getNotes,
                 createNote,
-                saveNote
+                saveNote,
+                deleteNote,
+                searchNote
             }}
         >
             {props.children}

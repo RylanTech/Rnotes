@@ -13,6 +13,7 @@ function Homepage() {
     const [newTitle, setNewTitle] = useState();
     const [newContent, setNewContent] = useState();
     const [notes, setNotes] = useState();
+    const [query, setQuery] = useState("")
 
     const [show, setShow] = useState()
     const handleClose = () => setShow(false);
@@ -33,7 +34,7 @@ function Homepage() {
     const handleThridClose = () => setShowThird(false)
 
     const { verify } = useContext(UserContext)
-    const { createNote, getNotes, saveNote } = useContext(NoteContext)
+    const { createNote, getNotes, saveNote, deleteNote, searchNote } = useContext(NoteContext)
     const navigate = useNavigate()
 
 
@@ -55,29 +56,22 @@ function Homepage() {
     }, [])
 
     function handleResize() {
-        // Get the new screen width
         let newScreenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-        // Log the new screen width to the console
         setScreenWidth(newScreenWidth)
-
-        // You can do additional things with the new width here
     }
 
     window.addEventListener("resize", handleResize);
 
-    // let notes = [
-    //     {
-    //         noteId: 1,
-    //         title: "title",
-    //         content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    //     },
-    //     {
-    //         noteId: 2,
-    //         title: "title2",
-    //         content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-    //     },
-    // ]
+    async function search(q) {
+        setQuery(q)
+        if (q.length > 0) {
+            let res = await searchNote(q)
+            setNotes(res)
+        } else {
+            let ntes = await getNotes()
+            setNotes(ntes)
+        }
+    }
 
     async function handleSubmitEdit() {
         const editedNote = {
@@ -90,11 +84,20 @@ function Homepage() {
         if (res) {
             let refreshedNote = await getNotes()
             setNotes(refreshedNote)
-            setCurrentContent("")
-            setCurrentNoteId("")
-            setCurrentUserId()
-            setCurrentTitle("")
+            handleClear()
             handleClose()
+        }
+    }
+
+    async function handleDelete(id) {
+        let res = await deleteNote(id)
+        if (res) {
+            if (res) {
+                let refreshedNote = await getNotes()
+                setNotes(refreshedNote)
+                handleClear()
+                handleClose()
+            }
         }
     }
 
@@ -108,15 +111,54 @@ function Homepage() {
             handleThridClose()
             let refreshedNote = await getNotes()
             setNotes(refreshedNote)
-            setNewContent("")
-            setNewTitle("")
+            handleClear()
         }
     }
-    
+
+    async function handleSubmitNewOnLarge() {
+        let newNote = {
+            content: currentContent,
+            title: currentTitle
+        }
+        let res = await createNote(newNote)
+        if (res) {
+            handleThridClose()
+            let refreshedNote = await getNotes()
+            setNotes(refreshedNote)
+            handleClear()
+        }
+    }
+
+    function handleClear() {
+        setCurrentContent("")
+        setCurrentTitle("")
+        setNewContent("")
+        setNewTitle("")
+    }
 
     function MapTroughOne() {
         if (notes) {
-            console.log(notes)
+            if (notes.length > 0) {
+                return notes.map((note) => {
+                    console.log(note)
+                    return (
+                        <div className="col-6" key={note.noteId}>
+                            <Card
+                                onClick={() => handleShow(note)}
+                                className="contentCard col-12"
+                            >
+                                <Card.Title>{note.title}</Card.Title>
+                                <Card.Body className="pageTxtContent">{note.content}</Card.Body>
+                            </Card>
+                        </div>
+                    )
+                })
+            }
+        }
+    }
+
+    function MapTroughTwo() {
+        if (notes) {
             if (notes.length > 0) {
                 return notes.map((note) => {
                     console.log(note)
@@ -164,6 +206,12 @@ function Homepage() {
                         </textarea>
                     </Modal.Body>
                     <Modal.Footer>
+                        <Button
+                            variant="danger"
+                            onClick={() => { handleDelete(currentNoteId) }}
+                        >
+                            Delete
+                        </Button>
                         <Button
                             onClick={handleSubmitEdit}
                         >
@@ -234,7 +282,7 @@ function Homepage() {
                             <Form.Group
                                 className="col-9 searchBar"
                             >
-                                <Form.Control />
+                                <Form.Control value={query} onChange={(e) => search(e.target.value)} />
                             </Form.Group>
                             <div className="col-3">
                                 <center>
@@ -266,9 +314,115 @@ function Homepage() {
     } else {
         return (
             <>
+                <Modal show={showTwo} onHide={handleTwoClose}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>
+                            Menu
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Link to={"/"}>
+                            <Button variant="secondary" onClick={handleTwoClose}>
+                                Close
+                            </Button>
+                        </Link>
+                        <Button>
+                            Submit
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <div className="navigation">
+                    <Container>
+                        <Row>
+                            <Form.Group
+                                className="col-9 searchBar"
+                            >
+                                <Form.Control />
+                            </Form.Group>
+                            <div className="col-3">
+                                <center>
+                                    <Button
+                                        onClick={handleTwoShow}
+                                        className="MenuBtn col-12">
+                                        Menu
+                                    </Button>
+                                </center>
+                            </div>
+                        </Row>
+                    </Container>
+                </div>
                 <Container>
                     <Row>
-                        test2
+                        <div className="col-6">
+                            <br />
+                            <Row>
+                                {MapTroughTwo()}
+                            </Row>
+                        </div>
+                        <div className="col-6">
+                            <br />
+                            <div>
+                                <Button onClick={handleSubmitNewOnLarge} className="col-12">
+                                    Create
+                                </Button>
+                            </div>
+                            <br />
+                            <div className="mainTitle">
+                                <textarea
+                                    onChange={(e) => setCurrentTitle(e.target.value)}
+                                    className="txtarea"
+                                    placeholder="Title"
+                                    spellCheck="false"
+                                    rows={1}
+                                    value={currentTitle}>
+
+                                </textarea>
+                                <hr />
+                            </div>
+                            <textarea
+                                onChange={(e) => setCurrentContent(e.target.value)}
+                                className="col-12 txtarea"
+                                placeholder="content"
+                                rows={9}
+                                spellCheck={false}
+                                value={currentContent}>
+                            </textarea>
+                            <Row>
+                                <div>
+                                    <Button
+                                        className="col-12"
+                                        onClick={handleSubmitEdit}
+                                    >
+                                        Save
+                                    </Button>
+                                    <br/><br/>
+                                    <Row>
+                                        
+                                        <Button
+                                            className="col-4"
+                                            variant="danger"
+                                            onClick={() => { handleDelete(currentNoteId) }}
+                                        >
+                                            Delete
+                                        </Button>
+                                        <div className="col-4" />
+                                        <Button
+                                            className="col-4"
+                                            variant="secondary"
+                                            onClick={handleClear}>
+                                            Clear
+                                        </Button>
+                                    </Row>
+                                </div>
+
+                                <br />
+                                <br />
+
+                            </Row>
+                        </div>
                     </Row>
                 </Container>
             </>
