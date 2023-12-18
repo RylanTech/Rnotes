@@ -14,6 +14,7 @@ function Homepage() {
     const [newContent, setNewContent] = useState();
     const [notes, setNotes] = useState();
     const [query, setQuery] = useState("")
+    const [amountOR, setAmountOR] = useState(7)
 
     const [show, setShow] = useState()
     const handleClose = () => setShow(false);
@@ -52,6 +53,9 @@ function Homepage() {
         startup()
 
         let screWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        if (screWidth >= 1100) {
+            setAmountOR(16)
+        }
         setScreenWidth(screWidth)
     }, [])
 
@@ -134,13 +138,13 @@ function Homepage() {
         setCurrentTitle("")
         setNewContent("")
         setNewTitle("")
+        setCurrentNoteId()
     }
 
     function MapTroughOne() {
         if (notes) {
             if (notes.length > 0) {
                 return notes.map((note) => {
-                    console.log(note)
                     return (
                         <div className="col-6" key={note.noteId}>
                             <Card
@@ -161,7 +165,6 @@ function Homepage() {
         if (notes) {
             if (notes.length > 0) {
                 return notes.map((note) => {
-                    console.log(note)
                     return (
                         <div className="col-6" key={note.noteId}>
                             <Card
@@ -178,7 +181,7 @@ function Homepage() {
         }
     }
 
-    if (screenWidth <= 992) {
+    if (screenWidth <= 768) {
         return (
             <>
                 <Modal show={show} onHide={handleClose}>
@@ -260,7 +263,7 @@ function Homepage() {
                             placeholder="Body"
                             onChange={(e) => setNewContent(e.target.value)}
                             className="col-12 txtarea"
-                            rows={18}
+                            rows={16}
                             spellCheck={false}
                             value={newContent}>
                         </textarea>
@@ -337,10 +340,10 @@ function Homepage() {
                 <div className="navigation">
                     <Container>
                         <Row>
-                            <Form.Group
+                        <Form.Group
                                 className="col-9 searchBar"
                             >
-                                <Form.Control />
+                                <Form.Control value={query} onChange={(e) => search(e.target.value)} />
                             </Form.Group>
                             <div className="col-3">
                                 <center>
@@ -386,36 +389,43 @@ function Homepage() {
                                 onChange={(e) => setCurrentContent(e.target.value)}
                                 className="col-12 txtarea"
                                 placeholder="content"
-                                rows={9}
+                                rows={amountOR}
                                 spellCheck={false}
                                 value={currentContent}>
                             </textarea>
                             <Row>
                                 <div>
-                                    <Button
-                                        className="col-12"
-                                        onClick={handleSubmitEdit}
-                                    >
-                                        Save
-                                    </Button>
-                                    <br/><br/>
-                                    <Row>
-                                        
-                                        <Button
-                                            className="col-4"
-                                            variant="danger"
-                                            onClick={() => { handleDelete(currentNoteId) }}
-                                        >
-                                            Delete
-                                        </Button>
-                                        <div className="col-4" />
-                                        <Button
-                                            className="col-4"
-                                            variant="secondary"
-                                            onClick={handleClear}>
-                                            Clear
-                                        </Button>
-                                    </Row>
+                                    {currentNoteId ? (
+                                        <>
+                                            <Button
+                                                className="col-12"
+                                                onClick={handleSubmitEdit}
+                                            >
+                                                Save
+                                            </Button>
+                                            <br /><br />
+                                            <Row>
+
+                                                <Button
+                                                    className="col-4"
+                                                    variant="danger"
+                                                    onClick={() => { handleDelete(currentNoteId) }}
+                                                >
+                                                    Delete
+                                                </Button>
+                                                <div className="col-4" />
+                                                <Button
+                                                    className="col-4"
+                                                    variant="secondary"
+                                                    onClick={handleClear}>
+                                                    Clear
+                                                </Button>
+                                            </Row>
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
+
                                 </div>
 
                                 <br />
